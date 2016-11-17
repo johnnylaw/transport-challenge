@@ -12,8 +12,9 @@
   "dependencies": {
     "express": "^4.14.0",
     "express-http-proxy": "^0.10.1",
-    "http": "0.0.0",
-    "path": "^0.12.7"
+    "lodash": "^4.17.2",
+    "path": "^0.12.7",
+    "request": "^2.78.0"
   },
   "devDependencies": {},
   "description": ""

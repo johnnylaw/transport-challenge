@@ -31,25 +31,61 @@ $(function() {
     }
   });
 
+  var adjustCalendar = function() {
+    var timeZone = $('#from-airport').data('timeZone');
+    var dateAtOrigin = moment(new Date()).tz(timeZone);
+    var [year, month, day] = [dateAtOrigin.year(), dateAtOrigin.month(), dateAtOrigin.date()];
+    dateOfTravel.datepicker('option', 'minDate', new Date(year, month, day));
+  }
+
   var checkForm = function() {
     var complete = true;
+
     $('#from-airport, #to-airport').each(function() {
       var airportCode = $(this).data('code');
       if (airportCode === undefined || airportCode.length != 3) complete = false;
     });
 
-    console.log("airports:", complete);
-    var date = $('#date-of-travel').val();
-    complete = complete && date.match(/^[\d]{4}-[\d]{2}-[\d]{2}$/);
-    console.log("date:", complete);
+    complete = complete && $('#date-of-travel').val().match(/^[\d]{4}-[\d]{2}-[\d]{2}$/);
 
     $('#search-button').attr('disabled', !complete);
+
+    adjustCalendar();
   }
 
-  var dateOfTravel = $('#date-of-travel').datepicker({
+  var dateOfTravel = $('#date-of-travel');
+  dateOfTravel.datepicker({
     minDate: new Date(),
     dateFormat: 'yy-mm-dd',
-    onSelect: checkForm
+    onSelect: function() {
+      checkForm();
+    }
   });
+  var showResults = function(results) {
+  };
+  $('#search-button').on('click', function() {
+    var originatingAirportInfo = $('#from-airport').data();
+    var fancyWaitingAnimation = $('#search-results .waiting');
+    fancyWaitingAnimation.removeClass('hidden');
+
+    $.ajax({
+      url: '/search',
+      method: 'GET',
+      data: {
+        date: $('#date-of-travel').val(),
+        from: $('#from-airport').data('code'),
+        to: $('#to-airport').data('code')
+      },
+      success: function(flights) {
+        fancyWaitingAnimation.addClass('hidden');
+        showResults(flights);
+      }
+    });
+  });
+
+  $('#tabs').tabs({
+    active: 2,
+  });
+
   $('#from-airport').select();
 });
