@@ -11,6 +11,12 @@ app.use('/airports', proxy('node.locomote.com', {
   }
 }));
 
+app.use('/airlines', proxy('node.locomote.com', {
+  forwardPath: function(request, response) {
+    return '/code-task/airlines';
+  }
+}));
+
 var server = app.listen(3000, function() {
   console.log('Started server on port ' + server.address().port);
 });
