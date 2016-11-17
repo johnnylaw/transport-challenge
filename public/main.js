@@ -61,12 +61,62 @@ $(function() {
       checkForm();
     }
   });
-  var showResults = function(results) {
+
+  var durationString = function(minutes) {
+    var hours = parseInt(minutes / 60);
+    var minutes = minutes % 60;
+    return hours.toString() + 'h' + minutes.toString().replace(/^([\d])$/, "0$1") + 'm';
   };
+
+  var showResults = function(results) {
+    var list = $('#day-2 ul.results-list')
+    list.html('');
+
+    results.forEach(function(result) {
+      var row = $('<li class="row">');
+      var div = $('<div class="col-md-2 col-xs-4">');
+      div.html(result.airline.name + '<br />' + result.airline.code + result.flightNum);
+      row.append(div);
+
+      var format = {
+        date: 'MMM D ',
+        time: 'h:mm a'
+      }
+      var start = moment(new Date()).tz(result.start.timeZone)
+      div = $('<div class="col-md-2 col-xs-4">');
+      div.html('Dpt ' + result.start.airportCode + '<br />' + start.format(format.date) + '<br />' + start.format(format.time));
+      row.append(div);
+
+      var finish = moment(new Date()).tz(result.finish.timeZone)
+      div = $('<div class="col-md-2 col-xs-4">');
+      div.html('Arr ' + result.finish.airportCode + '<br />' + finish.format(format.date) + '<br />' + finish.format(format.time));
+      row.append(div);
+
+      div = $('<div class="clearfix visible-xs-block visible-sm-block">');
+      div.html('<br />');
+      row.append(div);
+
+      div = $('<div class="col-md-2 col-xs-4">');
+      div.html('Duration<br />' + durationString(result.durationMin));
+      row.append(div);
+
+      div = $('<div class="col-md-2 col-xs-4">');
+      div.html(result.plane.shortName.split(' ').join('<br />'));
+      row.append(div);
+
+      div = $('<div class="col-md-2 col-xs-4">');
+      div.html('<br />$' + parseInt(result.price));
+      row.append(div);
+
+      list.append(row)
+    });
+  };
+
   $('#search-button').on('click', function() {
     var originatingAirportInfo = $('#from-airport').data();
     var fancyWaitingAnimation = $('#search-results .waiting');
     fancyWaitingAnimation.removeClass('hidden');
+    $('ul.results-list').html('');
 
     $.ajax({
       url: '/search',

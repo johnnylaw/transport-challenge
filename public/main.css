@@ -17,3 +17,42 @@ div.search-bar div {
 div.search-button {
   padding: 20px 0;
 }
+
+div.waiting {
+  font-size: 30pt;
+  text-align: center;
+}
+
+.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+  padding: .5em 0;
+}
+
+.ui-tabs .ui-tabs-nav li {
+  width: 19%;
+  text-align: center;
+}
+
+.ui-tabs .ui-tabs-nav li a {
+  width: 100%;
+}
+
+ul.results-list {
+  list-style: none;
+  padding: 0;
+}
+
+ul.results-list li div {
+  padding: .5em 0;
+}
+
+ul.results-list li:nth-child(odd) {
+  background: #dddddd;
+}
+
+/*ul.results-list li:nth-child(even) {
+  background: #ffffff;
+}
+*/
+ul.results-list li div {
+  text-align: center;
+}
