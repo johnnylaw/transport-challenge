@@ -11,18 +11,29 @@ $(function() {
         success: function(data) {
           if (request.time >= timeOfLastSuccessfulAirportRequest) {
             timeOfLastSuccessfulAirportRequest = request.time;
-            var names = data.map(function(airport) {
-              return airport.airportCode + ' (' +
+            data.forEach(function(airport) {
+              airport.label = airport.airportCode + ' (' +
                 airport.airportName + ', ' +
                 airport.countryName + ')';
             });
-            response(names);
+            response(data);
           }
         }
       });
     },
-    minLength: 2
+    minLength: 2,
+    select: function(event, ui) {
+      $(this).data({
+        timeZone: ui.item.timeZone,
+        code: ui.item.airportCode
+      });
+    }
   });
 
   $('#from-airport').select();
+
+  var dateOfTravel = $('#date-of-travel').datepicker({
+    minDate: new Date(),
+    dateFormat: 'yy-mm-dd'
+  });
 });

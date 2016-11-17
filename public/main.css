@@ -4,7 +4,8 @@ body {
 
 div.container {
   background: white;
-  min-height: 500px;
+  margin-top: 1vh;
+  min-height: 98vh;
 }
 
 div.search-bar div {
