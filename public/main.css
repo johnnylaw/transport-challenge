@@ -56,3 +56,7 @@ ul.results-list li:nth-child(odd) {
 ul.results-list li div {
   text-align: center;
 }
+
+ul.tabs-list a.past {
+  color: red;
+}
