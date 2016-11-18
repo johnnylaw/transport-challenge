@@ -33,9 +33,11 @@ $(function() {
 
   var adjustCalendar = function() {
     var timeZone = $('#from-airport').data('timeZone');
-    var dateAtOrigin = moment(new Date()).tz(timeZone);
-    var [year, month, day] = [dateAtOrigin.year(), dateAtOrigin.month(), dateAtOrigin.date()];
-    dateOfTravel.datepicker('option', 'minDate', new Date(year, month, day));
+    if (timeZone !== undefined) {
+      var dateAtOrigin = moment(new Date()).tz(timeZone);
+      var [year, month, day] = [dateAtOrigin.year(), dateAtOrigin.month(), dateAtOrigin.date()];
+      dateOfTravel.datepicker('option', 'minDate', new Date(year, month, day));
+    }
   }
 
   var checkForm = function() {

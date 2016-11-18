@@ -93,7 +93,12 @@ $(function() {
 
     [0, -1, 1, -2, 2].forEach(function(offset) {
       var tabNumber = offset + 2;
-      var date = moment(new Date(baseDate.getTime() + offset * millisecondsPerDay)).tz(originatingAirportTimeZone);
+      var date = moment(new Date(baseDate.getTime() + offset * millisecondsPerDay));
+
+      if(originatingAirportTimeZone !== undefined) {
+        date = date.tz(originatingAirportTimeZone);
+      }
+
       searchAndReportForDate(date, tabNumber);
       writeTabTitles(date, tabNumber);
     });
