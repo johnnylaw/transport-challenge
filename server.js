@@ -49,10 +49,14 @@ var getFlights = function(airlines, query) {
       var callback = function(error, response, body) {
         responseCount += 1;
 
-        var newFlights = JSON.parse(body);
-        flights = flights.concat(newFlights);
-        if (responseCount == airlines.length) {
-          resolve(flights);
+        if (response.statusCode === 200) {
+          var newFlights = JSON.parse(body);
+          flights = flights.concat(newFlights);
+          if (responseCount == airlines.length) {
+            resolve(flights);
+          }
+        } else {
+          resolve([]);
         }
       };
 
