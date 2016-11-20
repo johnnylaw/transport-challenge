@@ -40,6 +40,7 @@ $(function() {
         .data({ airport: possibleAirport })
         .val(airportDisplayName(possibleAirport));
       }
+      $textField.toggleClass('error', !possibleAirport);
     }
   }
 
@@ -94,16 +95,18 @@ $(function() {
   }
 
   var checkForm = function() {
-    var complete = true;
+    var airportsComplete = true;
 
     $('#from-airport, #to-airport').each(function() {
       var airport = $(this).data().airport;
-      if (airport === undefined || airport.airportCode.length != 3) complete = false;
+      if (!airport || airport.airportCode.length != 3) complete = false;
     });
 
-    complete = complete && $('#date-of-travel').val().match(/^[\d]{4}-[\d]{2}-[\d]{2}$/);
+    var $calendar = $('#date-of-travel');
+    var calendarComplete = $calendar.val().match(/^[\d]{4}-[\d]{2}-[\d]{2}$/);
+    $calendar.toggleClass('error', calendarComplete);
 
-    $('#search-button').attr('disabled', !complete);
+    $('#search-button').attr('disabled', !airportsComplete || !calendarComplete);
 
     adjustCalendar();
   }

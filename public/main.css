@@ -60,3 +60,7 @@ ul.results-list li div {
 ul.tabs-list a.past {
   color: red;
 }
+
+input.error {
+  border: 2px solid red;
+}
