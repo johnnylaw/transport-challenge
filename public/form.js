@@ -16,30 +16,66 @@ $(function() {
   }
 
   function bubbleAirportCodeToTop(airports, searchString) {
+    searchString = searchString.toUpperCase().substring(0,3);
+    if (airports.length === 0) return undefined;
     airports.sort(function(a, b) {
       if (a.airportCode === searchString) return -1;
       else if (b.airportCode === searchString) return 1;
       return 0;
     });
+    var airport = airports[0];
+    if (airport.airportCode === searchString.toUpperCase()) {
+      return airport;
+    }
   }
 
-  $('#from-airport, #to-airport').autocomplete({
+  function ensureAirportInField($textField) {
+    var data = $textField.data();
+    var airport = data.airport;
+    var possibleAirport = data.possibleAirport;
+
+    if (!airport) {
+      if (possibleAirport) {
+        $textField
+        .data({ airport: possibleAirport })
+        .val(airportDisplayName(possibleAirport));
+      }
+    }
+  }
+
+  function resetTextFieldAirport($textField) {
+    $textField.data({ airport: null, possibleAirport: null });
+  }
+
+  $('#from-airport, #to-airport').on('blur', function() {
+    ensureAirportInField($(this));
+  }).autocomplete({
     source: function(request, response) {
+      var $textField = this.element;
+      resetTextFieldAirport($textField);
       request.time = new Date();
+
+      var ajaxSuccess = function(data) {
+        if (requestIsMostRecent(request)) {
+          data.forEach(function(airport) {
+            airport.label = airportDisplayName(airport);
+          });
+          var airportWithMatchingCode = bubbleAirportCodeToTop(data, request.term);
+
+          response(data);
+
+          if (airportWithMatchingCode) {
+            $textField.data({ possibleAirport: airportWithMatchingCode });
+            if (!$textField.is(':focus')) ensureAirportInField($textField);
+          }
+        }
+      };
 
       $.ajax({
         url: '/airports',
         method: 'get',
         data: { q: request.term },
-        success: function(data) {
-          if (requestIsMostRecent(request)) {
-            data.forEach(function(airport) {
-              airport.label = airportDisplayName(airport);
-            });
-            bubbleAirportCodeToTop(data, request.term.toUpperCase());
-            response(data);
-          }
-        }
+        success: ajaxSuccess
       });
     },
     minLength: 2,
@@ -76,7 +112,7 @@ $(function() {
   dateOfTravel.datepicker({
     minDate: new Date(),
     dateFormat: 'yy-mm-dd',
-    onSelect: checkForm
+    onClose: checkForm
   });
 
   $('#from-airport').select();
