@@ -59,6 +59,11 @@ $(function() {
   };
 
   var searchAndReportForDate = function(date, tabNumber) {
+    var airports = {
+      from: $('#from-airport').data().airport,
+      to: $('#to-airport').data().airport
+    };
+
     var fancyWaitingAnimation = $('#day-' + tabNumber + ' .waiting');
     fancyWaitingAnimation.removeClass('hidden');
 
@@ -67,19 +72,25 @@ $(function() {
       method: 'GET',
       data: {
         date: date.format('YYYY-MM-DD'),
-        from: $('#from-airport').data('code'),
-        to: $('#to-airport').data('code')
+        from: airports.from.airportCode,
+        to: airports.to.airportCode
       },
       success: function(flights) {
         fancyWaitingAnimation.addClass('hidden');
-        console.log(flights.length);
         showResults(flights, tabNumber);
       }
     });
   };
 
-  var writeTabTitles = function(date, tabNumber) {
-    $('#tab-' + tabNumber + ' a').html(date.format('MMM D'));
+  var writeTabTitles = function(date, tabNumber, past) {
+    var tab = $('#tab-' + tabNumber + ' a');
+    if (past) {
+      tab.html('Past');
+      tab.addClass('past');
+    } else {
+      tab.html(date.format('MMM D'));
+      tab.removeClass('past');
+    }
   };
 
   $('#search-button').on('click', function() {
@@ -87,20 +98,19 @@ $(function() {
 
     $('ul.results-list').html('');
 
-    var originatingAirportTimeZone = $('#from-airport').data('timeZone');
-    const baseDate = new Date($('#date-of-travel').val());
-    const millisecondsPerDay = 24 * 60 * 60 * 1000;
+    var originatingAirportTimeZone = $('#from-airport').data().airport.timeZone;
+    var dateString = $('#date-of-travel').val();
+    var baseDate = moment.tz(dateString, originatingAirportTimeZone);
+    window.date = baseDate;
 
     [0, -1, 1, -2, 2].forEach(function(offset) {
       var tabNumber = offset + 2;
-      var date = moment(new Date(baseDate.getTime() + offset * millisecondsPerDay));
-
-      if(originatingAirportTimeZone !== undefined) {
-        date = date.tz(originatingAirportTimeZone);
+      var date = baseDate.clone().add(offset, 'd');
+      var past = date.endOf('d') <= moment();
+      if (!past) {
+        searchAndReportForDate(date, tabNumber);
       }
-
-      searchAndReportForDate(date, tabNumber);
-      writeTabTitles(date, tabNumber);
+      writeTabTitles(date, tabNumber, past);
     });
   });
 
